@@ -1,7 +1,7 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="client")
 CORS(app)
 
 # Create a list called 'events' with a couple of sample event dictionaries
@@ -13,6 +13,7 @@ events =[{"id": 1, "title": "Summertime Ball"}, {"id": 2, "title": "Work Party"}
 @app.route("/", methods=["GET"])
 def index():
 	return jsonify({"message": "Welcome!"}), 200
+	# return render_template("index.html") if you wanted to render the html, otherwise, localhost will display the json message, and thus the json data
 
 # TASK: Create a GET route for "/events"
 # This route should return the full list of events as JSON
@@ -30,8 +31,8 @@ def get_events():
 @app.route("/events", methods=["POST"])
 def add_events():
 	data = request.get_json()
-	if not "title":
-		return ("Title is required", 404)
+	if not "title" in data:
+		return ("Title is required", 400)
 	new_event = {"id": len(events) + 1, "title": data["title"]}
 	events.append(new_event)
 	return jsonify(new_event), 201
